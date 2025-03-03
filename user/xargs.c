@@ -24,20 +24,21 @@ int main(int argc, char *argv[]) {
         int j = 0;
         for (i = 0; i < n; i++) {
             if (buf[i] == '\n') {  
-                buf[i] = 0; 
-                if (single_arg_mode) {
-                    cmd[fixed_args] = buf + j;
-                    cmd[fixed_args + 1] = 0;
-                    if (fork() == 0) {
-                        exec(cmd[0], cmd);
-                        fprintf(2, "exec failed\n");
-                        exit(1);
-                    }
-                    wait(0);
+                buf[i] = 0;  
+    
+                cmd[fixed_args] = buf + j; // Thêm đối số mới
+                cmd[fixed_args + 1] = 0;   // Đảm bảo danh sách tham số kết thúc bằng NULL
+    
+                if (fork() == 0) {
+                    exec(cmd[0], cmd);
+                    fprintf(2, "exec failed\n");
+                    exit(1);
                 } else {
-                    cmd[arg_count++] = buf + j;
+                    wait(0);
                 }
-                j = i + 1; 
+    
+                j = i + 1; // Chuyển sang tham số tiếp theo
+                fixed_args = argc - base_args; // Luôn đặt lại để không gộp nhiều dòng
             }
         }
     }
